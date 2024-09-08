@@ -78,6 +78,14 @@ class LWP_Contact_Form {
             return;
         }
 
+        // Run a security check.
+        // Return if the nonce is invalid.
+        // @see: https://developer.wordpress.org/reference/functions/wp_verify_nonce/
+
+        if( ! wp_verify_nonce( $_POST['_wpnonce'], 'lwp_contact_form_nonce' ) ) {
+            return;
+        }
+
         // Process form data here (sanitization skipped for now).
         $first_name = $_POST['first_name'];
         $last_name = $_POST['last_name'];
@@ -122,6 +130,11 @@ class LWP_Contact_Form {
 
                 <label for="message">Message</label>
                 <textarea id="message" name="message" required></textarea>
+
+                <?php // Add a nonce field here for security.
+                // @see: https://developer.wordpress.org/reference/functions/wp_nonce_field/
+                wp_nonce_field( 'lwp_contact_form_nonce' );
+                ?>
 
                 <button type="submit" name="lwp_contact_form_submit">Submit</button>
                 <small>* All fields are required.</small>
