@@ -28,7 +28,7 @@ class LWP_Contact_Form {
         // Enqueue minimal CSS for the form.
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
 
-        // Handle form submission.
+        // Handle form submission and display a success message.
         add_action( 'wp', [ $this, 'handle_submission' ] );
 
         // Register shortcode to render the contact form.
@@ -64,6 +64,10 @@ class LWP_Contact_Form {
             .lwp-contact-form button:hover {
                 background-color: #005177;
             }
+            .lwp-contact-form .success-message {
+                color: green;
+                font-weight: bold;
+            }
         </style>';
     }
 
@@ -73,9 +77,27 @@ class LWP_Contact_Form {
             return;
         }
 
-        print_r($_POST);
+        // Process form data here (sanitization skipped for now).
+        $first_name = $_POST['first_name'];
+        $last_name = $_POST['last_name'];
+        $subject = $_POST['subject'];
+        $email = $_POST['email'];
+        $message = $_POST['message'];
+        // Process the data - send an email or save to the database.
+        // For now, just display the success message.
 
-        wp_die();
+        // Display success message.
+        add_action( 'the_content', function( $content ) use ( $first_name, $last_name, $subject, $email, $message ) {
+            $success_message = '<div class="lwp-contact-form success-message">';
+            $success_message .= '<p>Thank you for your message!</p>';
+            $success_message .= '<p>First Name: ' . $first_name . '</p>';
+            $success_message .= '<p>Last Name: ' . $last_name . '</p>';
+            $success_message .= '<p>Subject: ' . $subject . '</p>';
+            $success_message .= '<p>Email: ' . $email . '</p>';
+            $success_message .= '<p>Message: ' . $message . '</p>';
+            $success_message .= '</div>';
+            return $success_message . $content;
+        } );
 
 
     }

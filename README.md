@@ -8,3 +8,4 @@
 - `step-4` - Adds the form fields HTML.
 - `step-5` - Adds the CSS for the form.
 - `step-6` - Adds the submission handler, print the form data for testing.
+- `step-7` - Adds the success message.
