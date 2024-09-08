@@ -28,6 +28,9 @@ class LWP_Contact_Form {
         // Enqueue minimal CSS for the form.
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
 
+        // Handle form submission.
+        add_action( 'wp', [ $this, 'handle_submission' ] );
+
         // Register shortcode to render the contact form.
         add_shortcode( 'lwp_contact_form', [ $this, 'render_contact_form' ] );
     }
@@ -62,6 +65,19 @@ class LWP_Contact_Form {
                 background-color: #005177;
             }
         </style>';
+    }
+
+    public function handle_submission() {
+        // Check nonce.
+        if ( ! isset( $_POST['lwp_contact_form_submit'] ) ) {
+            return;
+        }
+
+        print_r($_POST);
+
+        wp_die();
+
+
     }
 
     public function render_contact_form() {
