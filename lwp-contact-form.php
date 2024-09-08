@@ -64,8 +64,9 @@ class LWP_Contact_Form {
             .lwp-contact-form button:hover {
                 background-color: #005177;
             }
-            .lwp-contact-form .success-message {
+            .lwp-contact-form.success-message {
                 color: green;
+                background: #F2FBF2DB;
                 font-weight: bold;
             }
         </style>';
