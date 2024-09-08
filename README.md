@@ -11,3 +11,5 @@
 - `step-7` - Adds the success message.
 - `step-8` - Adds the nonce field.
 - `step-9` - Adds the sanitization of form data.
+- `step-10` - Save form entry to the database.
+- `step-11` - Display form entries values in the admin.

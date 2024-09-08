@@ -33,6 +33,15 @@ class LWP_Contact_Form {
 
         // Register shortcode to render the contact form.
         add_shortcode( 'lwp_contact_form', [ $this, 'render_contact_form' ] );
+
+        //Register custom post type for form entries.
+        add_action( 'init', [ $this, 'register_post_type' ] );
+
+        // Add custom columns to the form entry post type.
+        add_filter('manage_lwp-form-entry_posts_columns', [ $this, 'add_custom_columns' ] );
+
+        // Display values in custom columns.
+        add_action( 'manage_lwp-form-entry_posts_custom_column', [ $this, 'display_custom_columns' ], 10, 2 );
     }
 
     public function enqueue_styles() {
@@ -92,23 +101,90 @@ class LWP_Contact_Form {
         $subject = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : '';
         $email = isset( $_POST['email'] ) ? sanitize_text_field( wp_unslash( $_POST['email'] ) ) : '';
         $message = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
-        // Process the data - send an email or save to the database.
-        // For now, just display the success message.
+        // Process the data.
+        // Save data to the database as lwp-form-entry post type.
+        $post_id = wp_insert_post( [
+            'post_title' => 'Form submission - ' . $subject,
+            'post_content' => $message,
+            'post_status' => 'publish',
+            'post_type' => 'lwp-form-entry',
+            'meta_input' => [
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'email' => $email,
+            ],
+        ] );
 
         // Display success message.
-        add_action( 'the_content', function( $content ) use ( $first_name, $last_name, $subject, $email, $message ) {
+        add_action( 'the_content', function( $content ) use ( $first_name, $last_name, $subject, $email, $message, $post_id ) {
             $success_message = '<div class="lwp-contact-form success-message">';
             $success_message .= '<p>Thank you for your message!</p>';
+
+            if( $post_id ){
+                $success_message .= '<p>Form entry saved successfully.</p>';
+            }
+
             $success_message .= '<p>First Name: ' . $first_name . '</p>';
             $success_message .= '<p>Last Name: ' . $last_name . '</p>';
             $success_message .= '<p>Subject: ' . $subject . '</p>';
             $success_message .= '<p>Email: ' . $email . '</p>';
             $success_message .= '<p>Message: ' . $message . '</p>';
             $success_message .= '</div>';
+
             return $success_message . $content;
         } );
 
 
+    }
+
+    /**
+     * Register custom post type for form entries.
+     *
+     * @return void
+     */
+    public function register_post_type(){
+        register_post_type( 'lwp-form-entry', [
+            'labels' => [
+                'name' => 'Form Entries',
+                'singular_name' => 'Form Entry',
+            ],
+            'public' => false,
+            'show_ui' => true,
+        ] );
+    }
+
+    /**
+     * Add custom columns to the form entry post type.
+     *
+     * @param array $columns Existing columns.
+     *
+     * @return array Modified columns.
+     */
+    public function add_custom_columns( $columns ) {
+        $columns['first_name'] = 'First Name';
+        $columns['last_name'] = 'Last Name';
+        $columns['email'] = 'Email';
+        return $columns;
+    }
+
+    /**
+     * Display values in custom columns.
+     *
+     * @param string $column  Column name.
+     * @param int    $post_id Post ID.
+     */
+    public function display_custom_columns( $column, $post_id ) {
+        switch ( $column ) {
+            case 'first_name':
+                echo get_post_meta( $post_id, 'first_name', true );
+                break;
+            case 'last_name':
+                echo get_post_meta( $post_id, 'last_name', true );
+                break;
+            case 'email':
+                echo get_post_meta( $post_id, 'email', true );
+                break;
+        }
     }
 
     public function render_contact_form() {
