@@ -6,3 +6,4 @@
 - `step-2` - Adds the form class and an empty index.php file.
 - `step-3` - Adds the shortcode and the placeholder for the form.
 - `step-4` - Adds the form fields HTML.
+- `step-5` - Adds the CSS for the form.
